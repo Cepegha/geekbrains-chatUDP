@@ -19,13 +19,13 @@ public class ChatUDP extends JFrame{
     private final int FRM_HEIGHT = 400;
 
     private final int PORT = 9876;
-    private final String IP_BROADCAST = "192.168.0.101"; //попробовать InetAddress.getLocalHost()
+    private final String IP_BROADCAST = "192.168.0.101"; //РїРѕРїСЂРѕР±РѕРІР°С‚СЊ InetAddress.getLocalHost()
 
     private class theReceiver extends Thread{
         @Override
         public synchronized void start() {
             super.start();
-            // организуем прием - серверную часть
+            // РѕСЂРіР°РЅРёР·СѓРµРј РїСЂРёРµРј - СЃРµСЂРІРµСЂРЅСѓСЋ С‡Р°СЃС‚СЊ
             try {
                 customize();
             } catch (Exception ex) {
@@ -33,28 +33,28 @@ public class ChatUDP extends JFrame{
             }
         }
         private void customize() throws Exception{
-            //открываем сокет на конкретный порт
+            //РѕС‚РєСЂС‹РІР°РµРј СЃРѕРєРµС‚ РЅР° РєРѕРЅРєСЂРµС‚РЅС‹Р№ РїРѕСЂС‚
             DatagramSocket receiveSocket = new DatagramSocket(PORT);
-            //чтобы отсечь лишнее в тексте используем регуляпки
-            Pattern regex  = Pattern.compile("[\u0020-\uFFFF]");//выведем все видимые для УТФ-8 символы отсекая первые 20 табуляция и тд.
+            //С‡С‚РѕР±С‹ РѕС‚СЃРµС‡СЊ Р»РёС€РЅРµРµ РІ С‚РµРєСЃС‚Рµ РёСЃРїРѕР»СЊР·СѓРµРј СЂРµРіСѓР»В¤РїРєРё
+            Pattern regex  = Pattern.compile("[\u0020-\uFFFF]");//РІС‹РІРµРґРµРј РІСЃРµ РІРёРґРёРјС‹Рµ РґР»В¤ вЂќвЂњвЂ-8 СЃРёРјРІРѕР»С‹ РѕС‚СЃРµРєР°В¤ РїРµСЂРІС‹Рµ 20 С‚Р°Р±СѓР»В¤С†РёВ¤ Рё С‚Рґ.
 
-            //бесконечно ждем
+            //Р±РµСЃРєРѕРЅРµС‡РЅРѕ Р¶РґРµРј
             while (true){
-                byte[] receiveData = new byte[1024];//килобайтной длины пакета пока хватит
+                byte[] receiveData = new byte[1024];//РєРёР»РѕР±Р°Р№С‚РЅРѕР№ РґР»РёРЅС‹ РїР°РєРµС‚Р° РїРѕРєР° С…РІР°С‚РёС‚
                 DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
                 receiveSocket.receive(receivePacket);
-                //подсмотрим адрес отправителя вУТП пакете
+                //РїРѕРґСЃРјРѕС‚СЂРёРј Р°РґСЂРµСЃ РѕС‚РїСЂР°РІРёС‚РµР»В¤ РІвЂќвЂњС• РїР°РєРµС‚Рµ
                 InetAddress IPAddress = receivePacket.getAddress();
                 int port = receivePacket.getPort();
 
                 String sentence = new String (receivePacket.getData());
                 Matcher m = regex.matcher(sentence);
 
-                taMain.append(IPAddress.toString() + ":"+port+": "); //перед сообщением добавим адрес и порт
+                taMain.append(IPAddress.toString() + ":"+port+": "); //РїРµСЂРµРґ СЃРѕРѕР±С‰РµРЅРёРµРј РґРѕР±Р°РІРёРј Р°РґСЂРµСЃ Рё РїРѕСЂС‚
                 while (m.find())
                     taMain.append(sentence.substring(m.start(), m.end()));
-                taMain.append("\r\n");//добавим переход на новую строку
-                taMain.setCaretPosition(taMain.getText().length());//каретку ставим в начало, чтобы новые строки не уходили вних
+                taMain.append("\r\n");//РґРѕР±Р°РІРёРј РїРµСЂРµС…РѕРґ РЅР° РЅРѕРІСѓСЋ СЃС‚СЂРѕРєСѓ
+                taMain.setCaretPosition(taMain.getText().length());//РєР°СЂРµС‚РєСѓ СЃС‚Р°РІРёРј РІ РЅР°С‡Р°Р»Рѕ, С‡С‚РѕР±С‹ РЅРѕРІС‹Рµ СЃС‚СЂРѕРєРё РЅРµ СѓС…РѕРґРёР»Рё РІРЅРёС…
             }
         };
     }
@@ -64,33 +64,33 @@ public class ChatUDP extends JFrame{
         new theReceiver().start();
     }
 
-    //метод отливливающий исключения в строку
-    //открываем в нем сокет, формируем пакет, отправить в широкое вещание
-    //при каждом вызове создается новый массив
+    //РјРµС‚РѕРґ РѕС‚Р»РёРІР»РёРІР°СЋС‰РёР№ РёСЃРєР»СЋС‡РµРЅРёВ¤ РІ СЃС‚СЂРѕРєСѓ
+    //РѕС‚РєСЂС‹РІР°РµРј РІ РЅРµРј СЃРѕРєРµС‚, С„РѕСЂРјРёСЂСѓРµРј РїР°РєРµС‚, РѕС‚РїСЂР°РІРёС‚СЊ РІ С€РёСЂРѕРєРѕРµ РІРµС‰Р°РЅРёРµ
+    //РїСЂРё РєР°Р¶РґРѕРј РІС‹Р·РѕРІРµ СЃРѕР·РґР°РµС‚СЃВ¤ РЅРѕРІС‹Р№ РјР°СЃСЃРёРІ
     private void btnSend_Handler()throws Exception{
         DatagramSocket sendSocket = new DatagramSocket();
-        InetAddress IPAdress = InetAddress.getByName(IP_BROADCAST);//распарсить строку в IP адрес
-        byte[] sendDate; //массив из байтов
-        String sentense = tfMq.getText(); //читаем текст из строки
-        tfMq.setText(""); //чтобы не флудить просто кликая на кнопку
-        sendDate = sentense.getBytes("UTF-8"); // стандартная кодировка для мультисистем - линус, мобилки, вин...
+        InetAddress IPAdress = InetAddress.getByName(IP_BROADCAST);//СЂР°СЃРїР°СЂСЃРёС‚СЊ СЃС‚СЂРѕРєСѓ РІ IP Р°РґСЂРµСЃ
+        byte[] sendDate; //РјР°СЃСЃРёРІ РёР· Р±Р°Р№С‚РѕРІ
+        String sentense = tfMq.getText(); //С‡РёС‚Р°РµРј С‚РµРєСЃС‚ РёР· СЃС‚СЂРѕРєРё
+        tfMq.setText(""); //С‡С‚РѕР±С‹ РЅРµ С„Р»СѓРґРёС‚СЊ РїСЂРѕСЃС‚Рѕ РєР»РёРєР°В¤ РЅР° РєРЅРѕРїРєСѓ
+        sendDate = sentense.getBytes("UTF-8"); // СЃС‚Р°РЅРґР°СЂС‚РЅР°В¤ РєРѕРґРёСЂРѕРІРєР° РґР»В¤ РјСѓР»СЊС‚РёСЃРёСЃС‚РµРј - Р»РёРЅСѓСЃ, РјРѕР±РёР»РєРё, РІРёРЅ...
 
-        DatagramPacket sendPacket = new DatagramPacket(sendDate, sendDate.length, IPAdress, PORT); //передаем в пакет данные + длину пакету + айпи + порт получателя
+        DatagramPacket sendPacket = new DatagramPacket(sendDate, sendDate.length, IPAdress, PORT); //РїРµСЂРµРґР°РµРј РІ РїР°РєРµС‚ РґР°РЅРЅС‹Рµ + РґР»РёРЅСѓ РїР°РєРµС‚Сѓ + Р°Р№РїРё + РїРѕСЂС‚ РїРѕР»СѓС‡Р°С‚РµР»В¤
         sendSocket.send(sendPacket);
     }
 
     private void framDraw(JFrame frame) {
         tfMq = new JTextField();
         taMain = new JTextArea(FRM_HEIGHT/19, 50);
-        JScrollPane spMain  = new JScrollPane(taMain);//колесо прокрутки, передаемобъект где применяется
+        JScrollPane spMain  = new JScrollPane(taMain);//РєРѕР»РµСЃРѕ РїСЂРѕРєСЂСѓС‚РєРё, РїРµСЂРµРґР°РµРјРѕР±СЉРµРєС‚ РіРґРµ РїСЂРёРјРµРЅВ¤РµС‚СЃВ¤
         spMain.setLocation(0,0);
-        taMain.setLineWrap(true); //переносы
-        taMain.setEditable(false); //отключаем редактирование окна вывода
+        taMain.setLineWrap(true); //РїРµСЂРµРЅРѕСЃС‹
+        taMain.setEditable(false); //РѕС‚РєР»СЋС‡Р°РµРј СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РѕРєРЅР° РІС‹РІРѕРґР°
 
         JButton btnSend = new JButton();
         btnSend.setText("Send");
         btnSend.setToolTipText("Broadcast a message");
-        // событие по клику на кнопку с применением лямюда выражения
+        // СЃРѕР±С‹С‚РёРµ РїРѕ РєР»РёРєСѓ РЅР° РєРЅРѕРїРєСѓ СЃ РїСЂРёРјРµРЅРµРЅРёРµРј Р»В¤РјСЋРґР° РІС‹СЂР°Р¶РµРЅРёВ¤
         btnSend.addActionListener(e -> {
             try {
                 btnSend_Handler();
@@ -99,14 +99,14 @@ public class ChatUDP extends JFrame{
             }
         });
 
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); //стандартное закрытие
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); //СЃС‚Р°РЅРґР°СЂС‚РЅРѕРµ Р·Р°РєСЂС‹С‚РёРµ
         frame.setTitle(FRM_TITLE);
         frame.setLocation(FRM_LOC_X, FRM_LOC_Y);
         frame.setSize(FRM_WIDTH,FRM_HEIGHT);
-        frame.setResizable(false); //запретить изменять размер
-        frame.getContentPane().add(BorderLayout.NORTH, spMain); //на верху, ЗЫ можно поробовать просто frame.add
-        frame.getContentPane().add(BorderLayout.CENTER, tfMq); //по центру
-        frame.getContentPane().add(BorderLayout.EAST, btnSend); //на востоке
+        frame.setResizable(false); //Р·Р°РїСЂРµС‚РёС‚СЊ РёР·РјРµРЅВ¤С‚СЊ СЂР°Р·РјРµСЂ
+        frame.getContentPane().add(BorderLayout.NORTH, spMain); //РЅР° РІРµСЂС…Сѓ, В«Сџ РјРѕР¶РЅРѕ РїРѕСЂРѕР±РѕРІР°С‚СЊ РїСЂРѕСЃС‚Рѕ frame.add
+        frame.getContentPane().add(BorderLayout.CENTER, tfMq); //РїРѕ С†РµРЅС‚СЂСѓ
+        frame.getContentPane().add(BorderLayout.EAST, btnSend); //РЅР° РІРѕСЃС‚РѕРєРµ
         frame.setVisible(true);
     }
 
